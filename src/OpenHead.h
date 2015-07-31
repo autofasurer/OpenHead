@@ -13,13 +13,13 @@ class ofApp : public ofBaseApp{
 	
 
     ofVideoPlayer           openHeadMovie;
-    int                     movieXpos, speed, timer, fullCircle;
+    int                     movieXpos, timer, fullCircle, scrollMod, scrollPulses, currentPos;
     bool                    waiting;
     ofxPhidgetsEncoder      enc;
-    float                   currentPos, oldPos, rotSpeed;
+    float                   oldPos, rotSpeed;
     double                  mean, meanCount, temp;
     float                   position, goal, difference;
     
-    float                   tourCount, scrollTimes, encoderPulses;
+    float                   widthDouble, scrollTimes, encoderPulses, speed;
 };
 

@@ -9,8 +9,10 @@ void ofApp::setup(){
 	ofHideCursor();
     
     encoderPulses = 29000;
-    scrollTimes = 10;
-    tourCount = encoderPulses / scrollTimes;
+    scrollTimes = 20;
+    scrollPulses = encoderPulses / scrollTimes;
+    widthDouble = ofGetWidth()*2.0f;
+   
     currentPos = oldPos = 0;
     movieXpos = 0;
     waiting = 0;
@@ -24,6 +26,7 @@ void ofApp::setup(){
     goal = 1.;
     temp = 26.;
     difference = 0.;
+    
 }
 
 //--------------------------------------------------------------
@@ -32,40 +35,23 @@ void ofApp::update(){
     openHeadMovie.update();
     enc.update();
     
-    currentPos = enc.encPos;
+    currentPos += temp;
+    scrollMod = currentPos % scrollPulses;
+    //currentPos = enc.encPos;
     rotSpeed = currentPos - oldPos;
-
-    meanCount += 1;
-    mean += temp;
     
-    cout << "mean: " << mean << endl;
-    cout << "meanCount: " << meanCount << endl;
-    cout << "speed: " << mean / meanCount << endl;
-    //speed = mean / meanCount;
+    movieXpos = ((scrollMod / (scrollPulses / widthDouble) ) - ofGetWidth())*-1.0f;
     
-    oldPos = currentPos;
+    cout << "movieXpos: " << movieXpos << endl;
     
-    speed = currentPos / tourCount;
-    
-    if (!waiting && movieXpos >= 0-ofGetWidth()){
-        movieXpos = movieXpos - speed;
-    }
-    else {
-    waiting = true;
-    timer += 1;
-        if (timer >= 100){
-            waiting = false;
-            timer = 0;
-            movieXpos = ofGetWidth();
-        }
-    }
     difference = (((goal - position) * 0.05) + difference) * 0.8;
     position += difference;
+  
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-	
+
     openHeadMovie.draw(movieXpos * position ,0, ofGetWidth(), ofGetHeight());
     
     
