@@ -1,23 +1,28 @@
 #include "OpenHead.h"
-#include "bounce.h"
+
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    currentPos = oldPos = 0;
-    newOffset = oldOffset = target = 1.000;
-	ofBackground(0,0,0);
+    
+    ofBackground(0,0,0);
 	ofSetVerticalSync(true);
 	ofHideCursor();
+    
+    encoderPulses = 29000;
+    scrollTimes = 10;
+    tourCount = encoderPulses / scrollTimes;
+    currentPos = oldPos = 0;
     movieXpos = 0;
     waiting = 0;
-	speed = 5;
+	speed = 0;
     timer = 0;
 	openHeadMovie.loadMovie("movies/OpenHead.mov");
 	openHeadMovie.play();
     enc.init();
     mean = meanCount = 0;
-    testposition = 0.;
+    position = 0.;
     goal = 1.;
+    temp = 26.;
     difference = 0.;
 }
 
@@ -26,11 +31,21 @@ void ofApp::update(){
     
     openHeadMovie.update();
     enc.update();
+    
     currentPos = enc.encPos;
     rotSpeed = currentPos - oldPos;
+
     meanCount += 1;
-    mean += rotSpeed;
+    mean += temp;
+    
+    cout << "mean: " << mean << endl;
+    cout << "meanCount: " << meanCount << endl;
+    cout << "speed: " << mean / meanCount << endl;
+    //speed = mean / meanCount;
+    
     oldPos = currentPos;
+    
+    speed = currentPos / tourCount;
     
     if (!waiting && movieXpos >= 0-ofGetWidth()){
         movieXpos = movieXpos - speed;
@@ -44,23 +59,23 @@ void ofApp::update(){
             movieXpos = ofGetWidth();
         }
     }
-    difference = ((((goal - testposition) * 0.05) + difference) * 0.8);
-    testposition += difference;
+    difference = (((goal - position) * 0.05) + difference) * 0.8;
+    position += difference;
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-	//ofPixels &pixels = openHead.getPixelsRef();
-    openHeadMovie.draw(movieXpos * testposition ,0, ofGetWidth(), ofGetHeight());
-    //cout << enc.encPos << endl;
-    oldOffset = newOffset;
+	
+    openHeadMovie.draw(movieXpos * position ,0, ofGetWidth(), ofGetHeight());
+    
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed  (int key){
     switch(key){
         case '0':
-            openHead.firstFrame();
+            openHeadMovie.firstFrame();
         break;
         
         case 'f':
@@ -79,45 +94,11 @@ void ofApp::keyPressed  (int key){
                 goal = 1.;
             }
         break;
+        case OF_KEY_UP:
+            temp += 10;
+            break;
+        case OF_KEY_DOWN:
+            temp -= 10;
+            break;
     }
-}
-
-//--------------------------------------------------------------
-void ofApp::keyReleased(int key){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
-	
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button){
-	}
-
-//--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button){
-	
-}
-
-
-//--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button){
-	
-}
-
-//--------------------------------------------------------------
-void ofApp::windowResized(int w, int h){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
-
 }
